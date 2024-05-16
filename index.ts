@@ -1,18 +1,50 @@
-console.log("Hello via Bun!");
+import { Elysia, t } from 'elysia'
+import * as console from "node:console";
 
-/*
-this is an express app with the following routes
-GET /Users
-GET /Users?Name=x
-GET /Shows
-GET /Shows/{NameOfShow}
-GET /Shows?Genre=y
-GET /Shows?ViewedBy=x
+new Elysia()
+    .get('/', () => 'hello')
 
-PUT /Shows/{NameOfShow}/Status
-PUT /Shows/{NameOfShow}/Rating
-PUT /Shows/{NameOfShow}/
+    .get('/users', () => 'users', {
+        query: t.Object({
+            name: t.String()
+        })
+    })
 
+    .get('/shows', () => 'Shows', {
+        query: t.Object({
+            name: t.String(),
+            genre: t.String(),
+            viewedBy: t.String()
+        })
+    })
 
-DELETE /Shows/{NameOfShow}
- */
+    .put('/shows/:id', ({ params }) => params, {
+        params: t.Object({
+            id: t.String()
+        })
+    })
+
+    .put('/shows/:id/status', ({ params }) => params, {
+        params: t.Object({
+            id: t.String()
+        })
+    })
+
+    .put('/shows/:id/rating', ({ params }) => params, {
+        params: t.Object({
+            id: t.String()
+        })
+    })
+    
+    .delete('/shows/:id', ({ params }) => params, {
+        params: t.Object({
+            id: t.String()
+        })
+    })
+    
+    .onError(({}) => {
+        console.error('Error occurred')
+        return "Not a route // API broke lmao"
+    })
+    
+    .listen(3000)

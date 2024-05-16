@@ -1,10 +1,7 @@
-const { Sequelize, DataTypes, Model } = require('sequelize')
-const path = require('path')
+import { drizzle } from 'drizzle-orm/bun-sqlite';
+import { Database } from 'bun:sqlite';
 
-const db = new Sequelize('database', 'username', 'password', {
-  dialect: 'sqlite',
-  storage: path.join(__dirname, 'db.sqlite'),
-  logging: false
-})
+const sqlite = new Database(':memory:');
+const db = drizzle(sqlite);
 
-module.exports = { db, DataTypes, Model }
+module.exports = {db}

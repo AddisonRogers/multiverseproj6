@@ -1,13 +1,9 @@
 // import our db, Model, DataTypes
-const { db, DataTypes } = require('../db/connection.ts')
+import {integer, sqliteTable, text} from "drizzle-orm/sqlite-core";
 
-// Creating a User child class from the Model parent class
-const Show = db.define('shows', {
-  title: DataTypes.STRING,
-  genre: DataTypes.STRING,
-  rating: DataTypes.INTEGER,
-  available: DataTypes.BOOLEAN
-})
-
-// exports
-module.exports = Show
+export const Shows = sqliteTable('shows', {
+  title: text('title'),
+  genre: text('genre'),
+  rating: integer('rating'),
+  available: integer('available', { mode: 'boolean'}),
+  });

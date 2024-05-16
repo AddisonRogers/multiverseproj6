@@ -1,11 +1,15 @@
-// import our db, Model, DataTypes
-const { db, DataTypes } = require('../db/connection.ts')
+import {integer, sqliteTable, text} from "drizzle-orm/sqlite-core";
+import {relations} from "drizzle-orm";
 
-// Creating a User child class from the Model parent class
-const User = db.define('users', {
-  username: DataTypes.STRING,
-  password: DataTypes.STRING
-})
+export const Users = sqliteTable('users', {
+  id: integer('user_id').primaryKey(),
+  username: text('username'),
+  password: text('password'),
+});
 
-// exports
-module.exports = User
+export const UsersRelations = relations(Users, ({ one }) => ({
+  invitee: one(Users, {
+    fields: [Users.invitedBy],
+    references: [Users.id],
+  }),
+}));

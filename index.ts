@@ -1,44 +1,78 @@
-import { Elysia, t } from 'elysia'
+import {Elysia, t} from 'elysia'
 import * as console from "node:console";
+import db from "./db/connection.ts";
+import shows from "./db/tables/Show.ts";
+import {eq} from "drizzle-orm";
 
 new Elysia()
     .get('/', () => 'hello')
 
-    .get('/users', () => 'users', {
+    .get('/users', () => {
+        
+        
+    }, {
         query: t.Object({
             name: t.String()
         })
     })
 
-    .get('/shows', () => 'Shows', {
+    .get('/shows', ({query}) => {
+        // This gets and returns all the Shows
+        return db.select().from(shows).where({
+            title: query.title,
+            genre: query.genre,
+            rating: t.Number(),
+            available: query.available
+        });
+        
+    }, {
         query: t.Object({
-            name: t.String(),
+            title: t.String(),
+            genre: t.String(), 
+            rating: t.Number(),
+            available: t.Number()
+        })
+    })
+
+    .put('/shows/:id', async ({ params, body }) => {
+        console.log(params.id)
+        db.insert(shows).values(body)
+    }, {
+        params: t.Object({
+            id: t.String()
+        }),
+        body: t.Object({
+            title: t.String(),
             genre: t.String(),
-            viewedBy: t.String()
+            rating: t.Number(),
+            available: t.Boolean()
         })
     })
 
-    .put('/shows/:id', ({ params }) => params, {
+    .put('/shows/:title/status', ({ params }) => {
+        db.update(shows).set({ available: false }).where(eq(shows.title, params.title));
+    }, {
         params: t.Object({
-            id: t.String()
+            title: t.String()
         })
     })
 
-    .put('/shows/:id/status', ({ params }) => params, {
+    .put('/shows/:title/rating', ({ params, body }) => {
+        db.update(shows).set({ rating: body.rating }).where(eq(shows.title, params.title));
+    }, {
         params: t.Object({
-            id: t.String()
-        })
-    })
-
-    .put('/shows/:id/rating', ({ params }) => params, {
-        params: t.Object({
-            id: t.String()
+            title: t.String()
+        }),
+        body: t.Object({
+            rating: t.Number()
         })
     })
     
-    .delete('/shows/:id', ({ params }) => params, {
+    .delete('/shows/:title', ({ params }) => {
+        db.delete(shows).where(eq(shows.title, params.title));
+    }, {
         params: t.Object({
-            id: t.String()
+            title: t.String()
         })
     })
     
